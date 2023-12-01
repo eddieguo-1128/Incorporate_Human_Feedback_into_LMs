@@ -1,6 +1,7 @@
 datasets 
+torch
 trl 
-torch 
 transformers
 sentencepiece
 transformers[sentencepiece]
+wandb

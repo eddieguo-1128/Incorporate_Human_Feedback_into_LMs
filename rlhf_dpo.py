@@ -19,7 +19,8 @@ class ScriptArguments:
     beta: Optional[float] = field(default=0.1, metadata={"help": "the beta parameter for DPO loss"})
 
     # training parameters
-    model_name_or_path: Optional[str] = field(default="agi-css/hh-rlhf-sft", metadata={"help": "the model name"})
+    default_model = "kaitchup/OPT-1.3B-SFT-DSChatLoRA" # "agi-css/hh-rlhf-sft"
+    model_name_or_path: Optional[str] = field(default=default_model, metadata={"help": "the model name"})
     learning_rate: Optional[float] = field(default=1e-3, metadata={"help": "optimizer learning rate"})
     per_device_train_batch_size: Optional[int] = field(default=4, metadata={"help": "batch size per device"})
     gradient_accumulation_steps: Optional[int] = field(
@@ -101,6 +102,8 @@ def get_hh(split: str, sanity_check: bool = False, silent: bool = False, cache_d
 if __name__ == "__main__":
     parser = HfArgumentParser(ScriptArguments)
     script_args = parser.parse_args_into_dataclasses()[0]
+    
+    print("init")
 
     # 1. load a pretrained model
     model = AutoModelForCausalLM.from_pretrained(script_args.model_name_or_path)
@@ -161,3 +164,6 @@ if __name__ == "__main__":
 
     # 6. train
     dpo_trainer.train()
+    
+    # save at checkpoint already
+    
