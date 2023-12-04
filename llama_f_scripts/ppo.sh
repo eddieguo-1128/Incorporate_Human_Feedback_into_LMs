@@ -3,11 +3,15 @@
 
 stage=ppo
 
-dataset=hh_rlhf_en
+dataset=alpaca_gpt4_en
+# hh_rlhf_en
+
+# use ModelScope
+export USE_MODELSCOPE_HUB=1
 
 # ModelScope model
 path_to_llama_model="modelscope/Llama-2-7b-ms"
-sft_path=sft-checkpoint/checpoint-600
+sft_path=sft-checkpoint/checkpoint-600
 rm_path=hh-rlhf-rm-open-llama-3b
 output_dir=${stage}-checkpoint
 
@@ -48,7 +52,7 @@ CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --num_train_epochs $n_epoch \
     --plot_loss \
     --fp16 \
-    --report_to wandb \ 
+    --report_to wandb \
     --reward_model $rm_path
 
 echo "experiment finish"
