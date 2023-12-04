@@ -30,7 +30,15 @@ echo "rm at $rm_path"
 
 mkdir $output_dir
 
-CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+echo "configure multi-GPUs"
+
+# configure the environment
+accelerate config 
+# arguments (same as above)
+
+
+# CUDA_VISIBLE_DEVICES=0 python src/train_bash.py 
+ accelerate launch src/train_bash.py \
     --stage $stage \
     --output_dir $output_dir \
     --model_name_or_path $path_to_llama_model \
