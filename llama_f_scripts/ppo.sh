@@ -5,19 +5,21 @@ stage=ppo
 
 dataset=hh_rlhf_en
 
-sft_path=hh-rlhf-sft
+# ModelScope model
+path_to_llama_model="modelscope/Llama-2-7b-ms"
+sft_path=sft-checkpoint/checpoint-600
 rm_path=hh-rlhf-rm-open-llama-3b
-output_dir=${sft_path}-${stage}-checkpoint
+output_dir=${stage}-checkpoint
 
 log_steps=10
-save_steps=1000
+save_steps=100
 lr=5e-5
-n_epoch=3.0
+n_epoch=1
 batch_size=4
 gradient_accumulation_steps=4
 lr_scheduler=cosine
 
-echo "training $sft_path of stage:$stage at $output_dir"
+echo "training stage:$stage at $output_dir"
 echo "output at $output_dir"
 echo "sft at $sft_path"
 echo "rm at $rm_path"
@@ -27,7 +29,8 @@ mkdir $output_dir
 CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --stage $stage \
     --output_dir $output_dir \
-    --model_name_or_path $sft_path \
+    --model_name_or_path $path_to_llama_model \
+    --checkpoint_dir $sft_path \
     --do_train \
     --dataset $dataset \
     --template default \
@@ -42,9 +45,10 @@ CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --logging_steps $log_steps \
     --save_steps $save_steps \
     --learning_rate 1e-5 \
-    --num_train_epochs 1.0 \
+    --num_train_epochs $n_epoch \
     --plot_loss \
     --fp16 \
+    --report_to wandb \ 
     --reward_model $rm_path
 
 echo "experiment finish"
