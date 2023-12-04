@@ -13,10 +13,11 @@ export USE_MODELSCOPE_HUB=1
 path_to_llama_model="modelscope/Llama-2-7b-ms"
 
 output_dir=${stage}-checkpoint
+sft_checkpoint=${output_dir}/checkpoint-400
 
 log_steps=10
-save_steps=1000
-n_epoch=3.0
+save_steps=100
+n_epoch=1
 batch_size=4
 gradient_accumulation_steps=4
 lr_scheduler="cosine"
@@ -48,9 +49,10 @@ mkdir $output_dir
     --logging_steps $log_steps \
     --save_steps $save_steps \
     --learning_rate 5e-5 \
-    --num_train_epochs 3.0 \
+    --num_train_epochs $n_epoch \
     --plot_loss \
     --fp16 \
+    --resume_from_checkpoint $sft_checkpoint \
     --report_to wandb
 
 echo "experiment finish"
