@@ -12,7 +12,7 @@ export USE_MODELSCOPE_HUB=1
 # ModelScope model
 path_to_llama_model="modelscope/Llama-2-7b-ms"
 sft_path=sft-checkpoint/checkpoint-600
-rm_path=hh-rlhf-rm-open-llama-3b
+rm_path=rm-checkpoint/checkpoint-600
 output_dir=${stage}-checkpoint
 
 log_steps=10

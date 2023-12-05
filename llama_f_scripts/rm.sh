@@ -12,6 +12,7 @@ path_to_llama_model="modelscope/Llama-2-7b-ms"
 
 output_dir=${stage}-checkpoint
 sft_checkpoint=sft-checkpoint/checkpoint-600
+rm_checkpoint=rm-checkpoint/checkpoint-600
 
 log_steps=10
 save_steps=100
@@ -29,7 +30,10 @@ mkdir $output_dir
 
 # training
 
-CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+# CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+  
+    
+accelerate launch src/train_bash.py \
     --stage $stage \
     --model_name_or_path $path_to_llama_model \
     --do_train \
@@ -40,7 +44,7 @@ CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --resume_lora_training False \
     --checkpoint_dir $sft_checkpoint \
     --output_dir $output_dir \
-    --per_device_train_batch_size 2 \
+    --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 4 \
     --lr_scheduler_type cosine \
     --logging_steps $log_steps \
@@ -49,4 +53,5 @@ CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --num_train_epochs $n_epoch \
     --plot_loss \
     --fp16 \
+    --resume_from_checkpoint $rm_checkpoint \
     --report_to wandb
