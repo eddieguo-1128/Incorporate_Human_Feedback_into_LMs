@@ -15,8 +15,8 @@ sft_path=sft-checkpoint/checkpoint-600
 rm_path=rm-checkpoint/checkpoint-600
 output_dir=${stage}-checkpoint
 
-log_steps=10
-save_steps=100
+log_steps=5
+save_steps=10
 lr=5e-5
 n_epoch=1
 batch_size=4
@@ -30,22 +30,23 @@ echo "rm at $rm_path"
 
 mkdir $output_dir
 
+# mult GPU part
 echo "configure multi-GPUs"
-
-# configure the environment
-accelerate config 
-# arguments (same as above)
+# accelerate config 
 
 
-# CUDA_VISIBLE_DEVICES=0 python src/train_bash.py 
- accelerate launch src/train_bash.py \
+
+# CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+# accelerate launch src/train_bash.py \
+
+CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
     --stage $stage \
     --output_dir $output_dir \
     --model_name_or_path $path_to_llama_model \
     --checkpoint_dir $sft_path \
     --do_train \
     --dataset $dataset \
-    --template default \
+    --template llama2 \
     --finetuning_type lora \
     --lora_target q_proj,v_proj \
     --resume_lora_training False \
