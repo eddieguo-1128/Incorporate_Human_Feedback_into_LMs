@@ -19,10 +19,10 @@ class ScriptArguments:
     beta: Optional[float] = field(default=0.1, metadata={"help": "the beta parameter for DPO loss"})
 
     # training parameters
-    default_model = "kaitchup/OPT-1.3B-SFT-DSChatLoRA" # "agi-css/hh-rlhf-sft"
+    default_model = "agi-css/hh-rlhf-sft"
     model_name_or_path: Optional[str] = field(default=default_model, metadata={"help": "the model name"})
-    learning_rate: Optional[float] = field(default=1e-3, metadata={"help": "optimizer learning rate"})
-    per_device_train_batch_size: Optional[int] = field(default=4, metadata={"help": "batch size per device"})
+    learning_rate: Optional[float] = field(default=1.41e-5, metadata={"help": "optimizer learning rate"})
+    per_device_train_batch_size: Optional[int] = field(default=1, metadata={"help": "batch size per device"})
     gradient_accumulation_steps: Optional[int] = field(
         default=1, metadata={"help": "the number of gradient accumulation steps"}
     )

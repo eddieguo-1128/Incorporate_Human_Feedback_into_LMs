@@ -76,4 +76,4 @@ for epoch, batch in tqdm(enumerate(ppo_trainer.dataloader)):
     ppo_trainer.log_stats(stats, batch, rewards)
 
 #### Save model
-ppo_trainer.save_model("hhrlhf_ppo__opt")
+ppo_trainer.save_model("hhrlhf_ppo")
