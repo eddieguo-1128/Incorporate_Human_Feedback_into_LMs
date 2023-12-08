@@ -7,18 +7,22 @@ dataset=alpaca_gpt4_en
 # hh_rlhf_en
 
 # use ModelScope
-export USE_MODELSCOPE_HUB=1
+# export USE_MODELSCOPE_HUB=1
 
  # ModelScope model
-path_to_llama_model="modelscope/Llama-2-7b-ms"
+path_to_llama_model="Mistral-7B-Instruct-v0.1"
+
+# "modelscope/Llama-2-7b-ms"
+
+template=mistral
 
 output_dir=${stage}-checkpoint
 sft_checkpoint=${output_dir}/checkpoint-400
 
-log_steps=10
+log_steps=5
 save_steps=100
 n_epoch=1
-batch_size=4
+batch_size=1
 gradient_accumulation_steps=4
 lr_scheduler="cosine"
 
@@ -33,12 +37,17 @@ mkdir $output_dir
 
 # training
 
-    CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+accelerate config
+
+#CUDA_VISIBLE_DEVICES=0 python src/train_bash.py \
+
+    
+accelerate launch src/train_bash.py \
     --stage $stage \
     --model_name_or_path $path_to_llama_model \
     --do_train \
     --dataset $dataset \
-    --template default \
+    --template $template \
     --finetuning_type lora \
     --lora_target q_proj,v_proj \
     --output_dir $output_dir \
@@ -48,11 +57,11 @@ mkdir $output_dir
     --lr_scheduler_type $lr_scheduler \
     --logging_steps $log_steps \
     --save_steps $save_steps \
-    --learning_rate 5e-5 \
+    --learning_rate 1e-5 \
     --num_train_epochs $n_epoch \
     --plot_loss \
     --fp16 \
-    --resume_from_checkpoint $sft_checkpoint \
+    --save_safetensors \
     --report_to wandb
 
 echo "experiment finish"

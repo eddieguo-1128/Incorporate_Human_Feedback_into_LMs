@@ -3,7 +3,7 @@
     "0": {
       "content": "<unk>",
       "lstrip": false,
-      "normalized": true,
+      "normalized": false,
       "rstrip": false,
       "single_word": false,
       "special": true
@@ -11,7 +11,7 @@
     "1": {
       "content": "<s>",
       "lstrip": false,
-      "normalized": true,
+      "normalized": false,
       "rstrip": false,
       "single_word": false,
       "special": true
@@ -19,28 +19,23 @@
     "2": {
       "content": "</s>",
       "lstrip": false,
-      "normalized": true,
+      "normalized": false,
       "rstrip": false,
       "single_word": false,
       "special": true
-    },
-    "32000": {
-      "content": "<pad>",
-      "lstrip": false,
-      "normalized": true,
-      "rstrip": false,
-      "single_word": false,
-      "special": false
     }
   },
+  "additional_special_tokens": [],
   "bos_token": "<s>",
+  "chat_template": "{{ bos_token }}{% for message in messages %}{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}{% if message['role'] == 'user' %}{{ '[INST] ' + message['content'] + ' [/INST]' }}{% elif message['role'] == 'assistant' %}{{ message['content'] + eos_token + ' ' }}{% else %}{{ raise_exception('Only user and assistant roles are supported!') }}{% endif %}{% endfor %}",
   "clean_up_tokenization_spaces": false,
   "eos_token": "</s>",
-  "legacy": false,
+  "legacy": true,
   "model_max_length": 1000000000000000019884624838656,
-  "pad_token": "<unk>",
+  "pad_token": "</s>",
   "padding_side": "right",
   "sp_model_kwargs": {},
+  "spaces_between_special_tokens": false,
   "split_special_tokens": false,
   "tokenizer_class": "LlamaTokenizer",
   "unk_token": "<unk>",

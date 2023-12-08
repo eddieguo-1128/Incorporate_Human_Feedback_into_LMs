@@ -1,6 +1,6 @@
 ---
 library_name: peft
-base_model: /home/ubuntu/.cache/modelscope/hub/modelscope/Llama-2-7b-ms
+base_model: Mistral-7B-Instruct-v0.1
 ---
 
 # Model Card for Model ID
@@ -204,4 +204,4 @@ Carbon emissions can be estimated using the [Machine Learning Impact calculator]
 ### Framework versions
 
 
-- PEFT 0.6.2
+- PEFT 0.6.0
