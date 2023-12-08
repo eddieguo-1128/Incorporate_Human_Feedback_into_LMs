@@ -6,3 +6,4 @@ sentencepiece
 transformers[sentencepiece]
 wandb
 accelerate
+
