@@ -1,0 +1,4 @@
+transformers 
+trl 
+wandb
+jupyter notebook
