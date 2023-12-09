@@ -70,8 +70,9 @@ if __name__ == "__main__":
     
     dataset = build_dataset(config)
 
-    # load the generation LM and the corresponding BERT model as RM
+    # load the generation LM 
     model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name)
+    # the reference model is used during evaluation to compare the ppo result
     ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name)
     tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
@@ -92,6 +93,8 @@ if __name__ == "__main__":
     device = ppo_trainer.accelerator.device
     if ppo_trainer.accelerator.num_processes == 1:
         device = 0 if torch.cuda.is_available() else "cpu"  # to avoid a `pipeline` bug
+
+    # sentiment analysis pipeline for BERT as Reward Model
     sentiment_pipe = pipeline("sentiment-analysis", model="lvwerra/distilbert-imdb", device=device)
 
     # Generation config
@@ -102,8 +105,8 @@ if __name__ == "__main__":
         "do_sample": True, 
         "pad_token_id": tokenizer.eos_token_id
     }
+
     
-    ## training loop
     with warnings.catch_warnings():
     warnings.simplefilter('ignore')
 
