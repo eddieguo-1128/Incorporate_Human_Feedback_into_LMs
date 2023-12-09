@@ -14,6 +14,7 @@ tqdm.pandas()
 from transformers import pipeline, AutoTokenizer
 from datasets import load_dataset
 
+# use the trainer class from huggingface
 from trl import PPOTrainer, PPOConfig, AutoModelForCausalLMWithValueHead
 from trl.core import LengthSampler
 
@@ -51,18 +52,9 @@ def collator(data):
 
 
 
-
-
 if __name__ == "__main__":
-    
-    dataset = build_dataset(config)
-    
-    model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name)
-    ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name)
-    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
-    tokenizer.pad_token = tokenizer.eos_token
-    
+
     # PPO Param
     config = PPOConfig(
         model_name="lvwerra/gpt2-imdb",
@@ -75,6 +67,16 @@ if __name__ == "__main__":
         "function_to_apply": "none", 
         "batch_size": 32
     }
+    
+    dataset = build_dataset(config)
+
+    # load the generation LM and the corresponding BERT model as RM
+    model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name)
+    ref_model = AutoModelForCausalLMWithValueHead.from_pretrained(config.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(config.model_name)
+
+    tokenizer.pad_token = tokenizer.eos_token
+
 
     # init PPO Trainer
     ppo_trainer = PPOTrainer(
@@ -86,7 +88,7 @@ if __name__ == "__main__":
         data_collator=collator
     )
     
-    # device hardward
+    # device hardware
     device = ppo_trainer.accelerator.device
     if ppo_trainer.accelerator.num_processes == 1:
         device = 0 if torch.cuda.is_available() else "cpu"  # to avoid a `pipeline` bug
@@ -124,14 +126,16 @@ if __name__ == "__main__":
 
         # generation
         response_tensors = []
+        # for each of the prompt, grab the response of the LM
         for query in query_tensors:
             gen_len = output_length_sampler()
             generation_kwargs["max_new_tokens"] = gen_len
             response = ppo_trainer.generate(query, **generation_kwargs)
             response_tensors.append(response.squeeze()[-gen_len:])
+        # decode the response to fit into the RM
         batch["response"] = [tokenizer.decode(r.squeeze()) for r in response_tensors]
 
-        # score
+        # put the prompt and the LM response together, feed into the RM pipeline to obtain scores as reward
         texts = [q + r for q, r in zip(batch["query"], batch["response"])]
         pipe_outputs = sentiment_pipe(texts, **sent_kwargs)
         rewards = [torch.tensor(output[1]["score"]) for output in pipe_outputs]
@@ -179,12 +183,6 @@ if __name__ == "__main__":
     df_results = pd.DataFrame(game_data)
 
     
-    print("mean:")
-    display(df_results[["rewards (before)", "rewards (after)"]].mean())
-    print()
-    print("median:")
-    display(df_results[["rewards (before)", "rewards (after)"]].median())
-    
-    model.save_pretrained("gpt2-imdb-pos-v2", push_to_hub=True)
-    tokenizer.save_pretrained("gpt2-imdb-pos-v2", push_to_hub=True)
+    model.save_pretrained("ppo-gpt2", push_to_hub=True)
+    tokenizer.save_pretrained("ppo-gpt2", push_to_hub=True)
 
